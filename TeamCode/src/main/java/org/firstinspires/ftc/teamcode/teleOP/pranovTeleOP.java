@@ -5,14 +5,15 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="LIL_RINO_Full_Strafe_Move", group="Robot")
 public class pranovTeleOP extends LinearOpMode {
 
-    DcMotor bL, fL, bR, fR, UC;
+    DcMotor bL, fL, bR, fR, arm, wrist;
+    Servo leftClaw, rightClaw, leftClip, rightClip;
     BNO055IMU imu;
 
     @Override
@@ -21,14 +22,20 @@ public class pranovTeleOP extends LinearOpMode {
         fL = hardwareMap.get(DcMotor.class, "fL");
         bR = hardwareMap.get(DcMotor.class, "bR");
         fR = hardwareMap.get(DcMotor.class, "fR");
-        UC = hardwareMap.get(DcMotor.class, "UC");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        wrist = hardwareMap.get(DcMotor.class, "wrist");
+        leftClaw = hardwareMap.servo.get("leftClaw");
+        rightClaw = hardwareMap.servo.get("rightClaw");
+        leftClip = hardwareMap.servo.get("leftClip");
+        rightClip = hardwareMap.servo.get("rightClip");
 
         // Reverse left motors so all move forward with same power
         bL.setDirection(DcMotor.Direction.REVERSE);
         fL.setDirection(DcMotor.Direction.REVERSE);
         bR.setDirection(DcMotor.Direction.FORWARD);
         fR.setDirection(DcMotor.Direction.FORWARD);
-        UC.setDirection(DcMotor.Direction.FORWARD);
+        arm.setDirection(DcMotor.Direction.FORWARD);
+        wrist.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Retrieve the IMU from the hardware map
         IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -41,10 +48,11 @@ public class pranovTeleOP extends LinearOpMode {
 
         waitForStart();
 
-//FIELD CENTRIC
-//        if (isStopRequested()) return;
-//
-//        while (opModeIsActive()) {
+
+        if (isStopRequested()) return;
+
+        while (opModeIsActive()) {
+            //FIELD CENTRIC
 //            double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
 //            double x = gamepad1.left_stick_x;
 //            double rx = gamepad1.right_stick_x;
@@ -72,13 +80,7 @@ public class pranovTeleOP extends LinearOpMode {
 //            double backLeftPower = (rotY - rotX + rx) / denominator;
 //            double frontRightPower = (rotY - rotX - rx) / denominator;
 //            double backRightPower = (rotY + rotX - rx) / denominator;
-//
-//            bL.setPower(backLeftPower);
-//            fL.setPower(frontLeftPower);
-//            bR.setPower(backRightPower);
-//            fR.setPower(frontRightPower);
 
-        while (opModeIsActive()) {
             // Get forward/back from left stick Y
             double drive = -gamepad1.left_stick_y;
 
@@ -104,17 +106,19 @@ public class pranovTeleOP extends LinearOpMode {
             }
 
             // Set powers
-            fL.setPower(frontLeftPower);
-            fR.setPower(frontRightPower);
             bL.setPower(backLeftPower);
+            fL.setPower(frontLeftPower);
             bR.setPower(backRightPower);
+            fR.setPower(frontRightPower);
 
-            // Claw (UC) on gamepad2
+            //arm on gamepad2
             if (Math.abs(gamepad2.left_stick_y) > 0.1) {
-                UC.setPower(1.0);
+                arm.setPower(1.0);
             } else {
-                UC.setPower(0);
+                arm.setPower(0);
             }
+
+            //
 
 
 
